@@ -1,0 +1,3 @@
+slack-bolt==1.19.0  # Slack Bolt framework
+slack-sdk==3.31.0   # Slack SDK (included via slack-bolt, but explicit for clarity)
+python-dotenv==1.0.1  # For loading .env files
