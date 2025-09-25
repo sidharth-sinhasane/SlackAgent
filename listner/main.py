@@ -1,9 +1,13 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import logging
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from config import SLACK_BOT_TOKEN, SOCKET_TOKEN
-from handlers import register_handlers
+from listner.config import SLACK_BOT_TOKEN, SOCKET_TOKEN
+from listner.handlers import register_handlers
 
 
 logging.basicConfig(level=logging.INFO)
