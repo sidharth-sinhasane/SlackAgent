@@ -1,6 +1,6 @@
 
 from temporalio import activity
-from slack_activities.db.search import search
+from db.search import search
 from utils.llm import get_ticket_details
 
 @activity.defn

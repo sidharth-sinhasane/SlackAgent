@@ -5,9 +5,8 @@ from dotenv import load_dotenv
 from typing import List, Dict, Optional
 import numpy as np
 
-# Add parent directory to path to import embeddings
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from embedding import EmbeddingGenerator
+# Import embeddings from utils
+from utils.embedding import EmbeddingGenerator
 
 load_dotenv()
 

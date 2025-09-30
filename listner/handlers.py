@@ -2,7 +2,7 @@ import logging
 from slack_bolt import App
 import time
 from listner.operations import send_message
-from slack_activities.db.insert_data import ingest
+from db.insert_data import ingest
 from schema.data_ingestion_schema import DataIngestionSchema
 import asyncio
 from run_workflow import main
