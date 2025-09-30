@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: vector_db
+    environment:
+      POSTGRES_DB: vector_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "8111:5431"
+    volumes:
+      - vector_db_data:/var/lib/postgresql/data
+    command: -c port=5431
+    restart: unless-stopped
+volumes:
+  vector_db_data:

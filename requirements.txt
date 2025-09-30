@@ -1,0 +1,11 @@
+python-dotenv
+pgvector
+psycopg2-binary
+openai
+temporalio
+
+slack-bolt==1.19.0  # Slack Bolt framework
+slack-sdk==3.31.0
+langchain-core
+langchain-openai
+langchain

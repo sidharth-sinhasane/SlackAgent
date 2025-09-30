@@ -1,0 +1,42 @@
+{
+    "name": "Slackagent Activities",
+    "version": "1.0.0", 
+    "description": "Temporal activities for Slackagent ticket creation workflow including vector DB search, Jira integration, LLM processing, and ticket creation",
+    "created_by": "system",
+    "updated_by": "system",
+    "config": {
+        "activities": [
+            {
+                "name": "read_from_vector_db_activity",
+                "description": "Searches vector database for relevant context using semantic similarity",
+                "inputs": ["query", "top_k", "channel_id"],
+                "outputs": ["search_results", "metadata"]
+            },
+            {
+                "name": "read_from_jira_activity", 
+                "description": "Retrieves issues from Jira project using JQL queries",
+                "inputs": ["project_key", "jql_query", "max_results"],
+                "outputs": ["jira_issues", "metadata"]
+            },
+            {
+                "name": "call_llm_for_ticket_details_activity",
+                "description": "Uses LLM to generate structured ticket details from context and user request", 
+                "inputs": ["context_data", "user_request", "ticket_type"],
+                "outputs": ["ticket_details", "generation_metadata"]
+            },
+            {
+                "name": "create_jira_ticket_activity",
+                "description": "Creates new Jira ticket with generated details",
+                "inputs": ["ticket_details", "project_key"],
+                "outputs": ["created_ticket", "creation_metadata"]
+            },
+            {
+                "name": "log_workflow_result_activity",
+                "description": "Logs workflow execution results for monitoring and debugging",
+                "inputs": ["workflow_result"],
+                "outputs": ["log_confirmation"]
+            }
+        ]
+    }
+}
+
