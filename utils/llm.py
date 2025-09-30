@@ -17,7 +17,7 @@ def get_ticket_details(metadata: dict) -> TicketDetailsSchema:
 
     prompt = PromptTemplate(
         template="""
-        You are an expert legal assistant. You will be provided with a list of messages and a list of existing tickets.
+        You are an expert legal assistant. You will be provided with a list of messages and a list of existing tickets and a user request.
         You need to generate a ticket details schema.
 
         context: 
@@ -31,23 +31,21 @@ def get_ticket_details(metadata: dict) -> TicketDetailsSchema:
 
         Messages: {messages}
         Existing tickets: {existing_tickets}
-
+        User request: {query}
         Output: {format_instructions}
         """,
-        input_variables=["messages", "existing_tickets"],
+        input_variables=["messages", "existing_tickets", "query"],
         partial_variables={"format_instructions": parser.get_format_instructions()},
         output_parser=parser
     )
-
-    print(prompt.format(messages=metadata['messages'], existing_tickets=metadata['existing_tickets']))
 
     model = OpenAI(model="gpt-4o-mini", api_key=os.getenv("OPENAI_API_KEY"))
 
     # Chain for better structure: prompt -> model -> parser
     chain = prompt | model | parser
-    result = chain.invoke({"messages": metadata['messages'], "existing_tickets": metadata['existing_tickets']})
+    result = chain.invoke({"messages": metadata['messages'], "existing_tickets": metadata['existing_tickets'], "query": metadata['query']})
 
-    print(result)
+    #print(result)
 
     return result
 
@@ -58,6 +56,7 @@ if __name__ == "__main__":
             'I need help with my ticket',
             'we need to create a ticket for building websocket connection with the slack server',
         ],
-        'existing_tickets': []
+        'existing_tickets': [],
+        'query': 'create a ticket for building websocket connection with the slack server'
     }
     get_ticket_details(metadata)
