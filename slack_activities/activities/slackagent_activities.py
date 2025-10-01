@@ -1,6 +1,6 @@
 
 from temporalio import activity
-from db.search import search
+from db.search import search_messages_with_neighbors
 from utils.llm import get_ticket_details
 
 @activity.defn
@@ -13,7 +13,7 @@ def say_hello(metadata: dict) -> dict:
 @activity.defn
 async def query_vector_db(metadata: dict) -> dict:
     print(f"Querying vector DB for: {metadata['query']}")
-    results = search(query=metadata['query'], top_k=metadata['top_k'], channel_id=metadata['channel_id'],threshold= 0.5)
+    results = search_messages_with_neighbors(query=metadata['query'], top_k=metadata['top_k'], channel_id=metadata['channel_id'],threshold= 0.5)
     print("#"*100,"\n")
     print(results)
     print("#"*100,"\n")

@@ -4,8 +4,9 @@ import sys
 from dotenv import load_dotenv
 from typing import List, Dict, Optional
 import numpy as np
-
 # Import embeddings from utils
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.embedding import EmbeddingGenerator
 
 load_dotenv()
@@ -84,18 +85,18 @@ def search(query: str, channel_id: str, top_k: Optional[int] = None, threshold: 
         # Search for similar messages in the specified channel
         if threshold is not None:
             search_query = """
-            SELECT message, embedding <=> (%s)::vector AS distance
+            SELECT id, message, created_at, embedding <=> (%s)::vector AS distance
             FROM messages
-            WHERE channel_id = %s AND embedding <=> (%s)::vector < %s
+            WHERE channel_id = %s AND embedding <=> (%s)::vector < %s AND handled = false
             ORDER BY distance
             LIMIT %s;
             """
             query_params = (query_embedding, channel_id.strip(), query_embedding, threshold, top_k)
         else:
             search_query = """
-            SELECT message, embedding <=> (%s)::vector AS distance
+            SELECT id, message, created_at, embedding <=> (%s)::vector AS distance
             FROM messages
-            WHERE channel_id = %s
+            WHERE channel_id = %s AND handled = false
             ORDER BY distance
             LIMIT %s;
             """
@@ -107,30 +108,74 @@ def search(query: str, channel_id: str, top_k: Optional[int] = None, threshold: 
         print(f"cursor","_"*100)
         results = cursor.fetchall()
         
-        # Extract just the messages (first column)
-        print(f"results","_"*100)
-        messages = [result[0] for result in results]
-        
-        threshold_msg = f" (threshold < {threshold})" if threshold is not None else ""
-        print(f"Found {len(messages)} similar messages in channel '{channel_id}'{threshold_msg}")
-        if results:
-            print(f"results","_"*100)
-            print(f"   Best match distance: {results[0][1]:.4f}")
-            print(f"   Worst match distance: {results[-1][1]:.4f}")
-            if threshold is not None:
-                print(f"   All results below threshold: {threshold}")
-        
         cursor.close()
         conn.close()
         print(f"conn closed","_"*100)
         
-        return messages
+        return results
         
     except Exception as e:
         print(f"Search failed: {e}")
         print(f"Search failed: {e}","_"*100)
         return []
 
+def search_messages_with_neighbors(query: str, channel_id: str, top_k: Optional[int] = None, threshold: Optional[float] = None) -> List[str]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    results = search(query, channel_id, top_k, threshold)
+
+    unique_messages = {}  # {id: message}
+
+    for result in results:
+        msg_id, message, created_at, distance = result
+        unique_messages[msg_id] = message
+
+    for result in results:
+        msg_id, message, created_at, distance = result
+
+        try:
+            cursor.execute("""
+                SELECT id, message
+                FROM messages
+                WHERE channel_id = %s AND created_at > %s 
+                ORDER BY created_at ASC
+                LIMIT 5
+            """, (channel_id, created_at))
+
+            neighbors = cursor.fetchall()
+            for row in neighbors:
+                neighbor_id, neighbor_message = row
+                if neighbor_id not in unique_messages:
+                    unique_messages[neighbor_id] = neighbor_message
+
+        except Exception as e:
+            print(f"Search failed: {e}")
+            continue
+    
+    try:    
+        cursor.execute("""
+            SELECT id, message
+            FROM messages
+            WHERE channel_id = %s AND handled = false
+            ORDER BY created_at DESC
+            LIMIT 5
+        """, (channel_id,))
+
+        last_messages = cursor.fetchall()
+        for row in last_messages:
+            last_id, last_message = row
+            if last_id not in unique_messages:
+                unique_messages[last_id] = last_message
+        print(f"Last messages: {last_messages}_____________________________________________________")
+    except Exception as e:
+        print(f"Failed to fetch last messages: {e}")
+
+    cursor.close()
+    conn.close()
+    
+    return list(unique_messages.values())
+
+    
 def search_detailed(query: str, channel_id: str, top_k: Optional[int] = None, threshold: Optional[float] = None) -> List[Dict]:
     """
     Search for semantically similar messages with detailed results
@@ -578,7 +623,6 @@ if __name__ == "__main__":
     print("Semantic Search System")
     print("=" * 50)
     
-    # List available channels first
     print("\nAvailable channels:")
     channels = list_channels()
     
@@ -586,8 +630,6 @@ if __name__ == "__main__":
         print("No channels found. Make sure you have inserted some messages first.")
         exit(1)
     
-    # Pick the first channel for testing
-    # test_channel = channels[0]
     test_channel = "C09G0HN0EKH"
     
     # Get channel stats
@@ -600,11 +642,7 @@ if __name__ == "__main__":
     
     # Test searches
     test_queries = [
-        # "how are you",
-        # "weather today", 
-        # "good morning",
-        # "vector database",
-        "redis cache"
+        "Agreed. Lets ask the bot to create a ticket."
     ]
     
     for query in test_queries:
@@ -621,7 +659,7 @@ if __name__ == "__main__":
         
         # Test with threshold (example: only results with distance < 0.8)
         print(f"\nSearching with threshold < 0.8:")
-        threshold_results = search(query=query, channel_id=test_channel, threshold=0.5, top_k=4)
+        threshold_results = search_messages_with_neighbors(query=query, channel_id=test_channel, threshold=0.5, top_k=4)
         if threshold_results:
             print(f"Threshold filtered results ({len(threshold_results)}):")
             for i, message in enumerate(threshold_results, 1):

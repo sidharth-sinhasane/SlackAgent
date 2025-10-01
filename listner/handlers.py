@@ -34,7 +34,10 @@ def register_handlers(app: App):
             object['user_id'] = event["user"]
             object['message'] = event["text"]
             object['created_at'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-            object['handled'] = False
+            if is_bot_mention:
+                object['handled'] = True
+            else:
+                object['handled'] = False
             object['metadata'] = {}
             object['mention_bot'] = is_bot_mention
             ingest(object)
