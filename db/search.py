@@ -156,7 +156,7 @@ def search_messages_with_neighbors(query: str, channel_id: str, top_k: Optional[
         cursor.execute("""
             SELECT id, message
             FROM messages
-            WHERE channel_id = %s
+            WHERE channel_id = %s AND handled = false
             ORDER BY created_at DESC
             LIMIT 5
         """, (channel_id,))
