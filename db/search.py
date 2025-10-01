@@ -87,7 +87,7 @@ def search(query: str, channel_id: str, top_k: Optional[int] = None, threshold: 
             search_query = """
             SELECT id, message, created_at, embedding <=> (%s)::vector AS distance
             FROM messages
-            WHERE channel_id = %s AND embedding <=> (%s)::vector < %s
+            WHERE channel_id = %s AND embedding <=> (%s)::vector < %s AND handled = false
             ORDER BY distance
             LIMIT %s;
             """
@@ -96,7 +96,7 @@ def search(query: str, channel_id: str, top_k: Optional[int] = None, threshold: 
             search_query = """
             SELECT id, message, created_at, embedding <=> (%s)::vector AS distance
             FROM messages
-            WHERE channel_id = %s
+            WHERE channel_id = %s AND handled = false
             ORDER BY distance
             LIMIT %s;
             """
