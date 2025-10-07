@@ -13,7 +13,11 @@ def get_ticket_details(metadata: dict) -> TicketDetailsSchema:
 
     parser = PydanticOutputParser(pydantic_object=TicketDetailsSchema)
 
-    print(parser.get_format_instructions())
+    #print(parser.get_format_instructions())
+
+    print("@"*100)
+    print(metadata['existing_tickets'], metadata['messages'], metadata['query'])
+    print("@"*100)
 
     prompt = PromptTemplate(
         template="""
@@ -46,15 +50,14 @@ def get_ticket_details(metadata: dict) -> TicketDetailsSchema:
     result = chain.invoke({"messages": metadata['messages'], "existing_tickets": metadata['existing_tickets'], "query": metadata['query']})
 
     #print(result)
-
-    return result
+    return result.dict()
 
 if __name__ == "__main__":
     metadata = {
         'messages': [
             'Hello, how are you?',
             'I need help with my ticket',
-            'we need to create a ticket for building websocket connection with the slack server',
+            'we need to create a ticket for building websocket connection with the slack server this is the high priority ticket',
         ],
         'existing_tickets': [],
         'query': 'create a ticket for building websocket connection with the slack server'

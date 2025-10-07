@@ -9,3 +9,4 @@ slack-sdk==3.31.0
 langchain-core
 langchain-openai
 langchain
+requests
