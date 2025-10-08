@@ -17,7 +17,6 @@ def register_handlers(app: App):
     def handle_message_events(event, say):
         if "subtype" not in event:  # Only handle user messages (ignore bot messages, edits, etc.)
             logger.info(f"Received message: {event['text']} from user {event['user']} in channel {event['channel']}")
-            # print(f"Received message: {event['text']} from user {event['user']} in channel {event['channel']}")
 
 
             auth_response = app.client.auth_test()
@@ -41,4 +40,3 @@ def register_handlers(app: App):
             object['metadata'] = {}
             object['mention_bot'] = is_bot_mention
             ingest(object)
-            send_message(app, event["channel"], "Hello!")

@@ -15,32 +15,32 @@ class SlackagentWorkflow:
         
         # 1. Say hello
         metadata = await workflow.execute_activity(
-            say_hello, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            say_hello, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
         
         # 2. Query vector database
         metadata = await workflow.execute_activity(
-            query_vector_db, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            query_vector_db, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
         
         # 3. Query Jira
         metadata = await workflow.execute_activity(
-            query_jira, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            query_jira, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
         
         # 4. Call LLM for ticket details
         metadata = await workflow.execute_activity(
-            call_llm_for_ticket_details, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            call_llm_for_ticket_details, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
-        
+
         # 5. Create Jira ticket
         metadata = await workflow.execute_activity(
-            create_jira_ticket, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            create_jira_ticket, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
         
         # 6. Log workflow result
         metadata = await workflow.execute_activity(
-            log_workflow_result, metadata, schedule_to_close_timeout=timedelta(seconds=5), task_queue="task_queue_1"
+            log_workflow_result, metadata, schedule_to_close_timeout=timedelta(seconds=10), task_queue="task_queue_1"
         )
         
         return metadata
