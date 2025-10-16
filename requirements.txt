@@ -1,6 +1,7 @@
 python-dotenv
 pgvector
 psycopg2-binary
+sqlalchemy
 openai
 temporalio
 
