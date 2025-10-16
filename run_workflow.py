@@ -2,13 +2,13 @@
 import asyncio
 from temporalio.client import Client
 
-from slack_workflows.workflows.slackagent_workflow import SlackagentWorkflow
+from slack_workflows.workflows.message_summerizer import MessageSummerizerWorkflow
 
 async def main(query,channel_id):
     client = await Client.connect("localhost:7233")
 
     metadata = {"name": "sid", "query": query, "top_k": 5, "channel_id": channel_id, "threshold": 0.5}
-    result = await client.execute_workflow(SlackagentWorkflow.run,metadata, id="my-workflow-id", task_queue="task_queue_1")
+    result = await client.execute_workflow(MessageSummerizerWorkflow.run,metadata, id="my-workflow-id", task_queue="task_queue_1")
 
     return result
 
